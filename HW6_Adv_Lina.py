@@ -70,11 +70,12 @@ class WorkCar(Car):
             return f'Is it the real speed?'
 
 class PoliceCar(Car):
-    def police(self):
+    def __init__(self, speed, color, name, is_police):
+        super().__init__(speed, color, name)
         self.is_police = True
 
 towncar1 = TownCar(speed=70,color='white',name='Ford')
-policecar1=PoliceCar(speed=60,color='white', name='Renault')
+policecar1=PoliceCar(speed=60,color='white', name='Renault', is_police=True)
 workcar1 = WorkCar(speed=40,color='black',name='Skoda')
 sportcar1 = SportCar(speed=240,color='red',name='BMW')
 print(towncar1.show_info())
