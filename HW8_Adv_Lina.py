@@ -75,7 +75,7 @@ def final(message):
     #          f"Статус заказа: {params_for_selection['status']}\n" \
     #          f"Дата обновления: {params_for_selection['updated_dt']}\n" \
     #          f"ID создателя: {params_for_selection['creator_id']}"
-        bot.reply_to(message, DbClient.ss())
+        bot.reply_to(message, DbClient.select_orders())
 
 
 bot.polling()
