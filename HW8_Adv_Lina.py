@@ -32,11 +32,7 @@ db_client = DbClientV2(DB_URL)
 db_client2 = DbClient(DB_URL)
 db_client2.setup()
 db_client.setup()
-
-
-def select_orders5(self):
-    with self.connect.cursor() as cursor:
-        return cursor.fetch(self.SELECT_QUERY1)
+db_client2.select_orders()
 
 @bot.message_handler(commands=["get_chat_id"])
 def get_chat_id(message):
@@ -47,37 +43,40 @@ def get_chat_id(message):
     bot.reply_to(message, text=msg_for_user)
 
 @bot.message_handler(commands=['select_orders'])
+def select_orders2(message):
+    bot.reply_to(message, text="Укажите, пожалуйста, статус заказа: ")
+    bot.register_next_step_handler(message, select_orders1)
+
 def select_orders1(message):
     params_for_selection = dict()
     params_for_selection['status'] = message.text
     print(f"Запрос статуса заказов")
-    msg_for_user = f"Укажите, пожалуйста, статус заказа"
+    msg_for_user = f"Введите дату обновления заказа:"
     bot.reply_to(message, text=msg_for_user)
-    bot.register_next_step_handler(message, upd_date)
+    bot.register_next_step_handler(message, upd_date, params_for_selection)
 
-def upd_date(message):
-    params_for_selection = dict()
+def upd_date(message, params_for_selection):
     params_for_selection['updated_dt'] = message.text
-    bot.reply_to(message, text="Введите дату обновления заказа: ")
-    print("Страшивает дату")
-    bot.register_next_step_handler(message, creator_id)
-
-def creator_id(message):
-    params_for_selection = dict()
-    params_for_selection['creator_id'] = message.text
     bot.reply_to(message, text="Введите id создателя: ")
+    print("Страшивает дату")
+    bot.register_next_step_handler(message, creator_id, params_for_selection)
+
+def creator_id(message, params_for_selection):
+    params_for_selection['creator_id'] = message.text
+    answer = f"Проверьте, пожалуйста, свой запрос:\n" \
+             f"Статус заказа: {params_for_selection['status']}\n" \
+             f"Дата обновления: {params_for_selection['updated_dt']}\n" \
+             f"ID создателя: {params_for_selection['creator_id']}\n"\
+             f"Если все ок, напишите, пожалуйста, 'ДА' "
     print("ID")
+    bot.reply_to(message, text=answer)
     bot.register_next_step_handler(message, final)
 
-
 def final(message):
-    # answer = f"Проверьте, пожалуйста, свой запрос:\n" \
-    #          f"Статус заказа: {params_for_selection['status']}\n" \
-    #          f"Дата обновления: {params_for_selection['updated_dt']}\n" \
-    #          f"ID создателя: {params_for_selection['creator_id']}"
-        bot.reply_to(message, DbClient.ss())
-
-
+    bot.reply_to(db_client.select_orders())
+    # bot.add_callback_query_handler(db_client.select_orders())
+    # bot.send_message(db_client.select_orders())
+    print(db_client.select_orders())
 bot.polling()
 
 while True:
